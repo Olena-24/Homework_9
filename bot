@@ -1,0 +1,67 @@
+def error_handler(func):
+    def inner(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+            return result
+        except KeyError:
+            return 'No user with this name'
+        except ValueError:
+            return 'Give me name and phone please'
+        except IndexError:
+            return 'Enter user name'
+    return inner
+
+user = {}  # Словник для зберігання імен і телефонів
+
+@error_handler
+def add(name, phone):
+    user[name] = phone
+    return f'Contact {name} added.'
+
+@error_handler
+def change(name, phone):
+    user[name] = phone
+    return f'Contact {name} updated.'
+
+@error_handler
+def phone(name):
+    return user[name]
+
+def show_all():
+    return '\n'.join([f'{name}: {phone}' for name, phone in user.items()])
+
+def exit_handler():
+    return 'Good bye!'
+
+def hello_handler():
+    return 'Hello, how can I help you?'
+
+def main():
+    COMMANDS = {'hello': hello_handler,
+                'add': add,
+                'change': change,
+                'phone': phone,
+                'show all': show_all,
+                'good bye': exit_handler,
+                'close': exit_handler,
+                'exit': exit_handler}
+
+    while True:
+        command = input().lower()
+        if command in ['good bye', 'close', 'exit']:
+            print(exit_handler())
+            break
+        if command in COMMANDS:
+            response = COMMANDS[command]()
+            print(response)
+        else:
+            parts = command.split(' ')
+            cmd, args = parts[0], parts[1:]
+            if cmd in COMMANDS:
+                response = COMMANDS[cmd](*args)
+                print(response)
+            else:
+                print("Unknown command")
+
+if __name__ == "__main__":
+    main()
